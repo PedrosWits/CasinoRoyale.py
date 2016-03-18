@@ -74,9 +74,8 @@ face is an integer value **between 0 and n-1**
 
 #### Creating loaded dices:
 
-Creating a loaded die requires that you pass a list containing the probability that
-each of the die's faces is rolled. The length of the list will be the number of faces
-of the die.
+Creating a loaded die requires a list containing the probability of rolling each face of the die.  
+The length of the list corresponds to the number of faces of the die.
 
 However, **LoadedDie** is an abstract class used as a common base for different possible implementations.  
 We provide 6 different implementations of the **Loaded Die**, based on Keith's post:
@@ -100,9 +99,10 @@ For instance, you can create Mutated Dies like this:
   # or 
   mutant3 = MutatedDie(psides = [0.5, 0.1, 0.1, 0.3], verifyInput = True)
   # or
-  mutant4 = MutatedDie(psides = [0.5, 0.2, 0.3], verifyInput = False)
+  # this does not raise a ValueError exception
+  mutant4 = MutatedDie(psides = [0.4, 0.5, 0.2], verifyInput = False)
   # or
-  # this throws a ValueError exception
+  # this raises a ValueError exception
   mutant5 = MutatedDie([0.4, 0.5, 0.2], True)
 ```
 
@@ -151,7 +151,7 @@ be larger than the available memory in RAM. Thus, checking the size of the array
 
 ## The End
 
-Any comments or suggestions, email me at ppintodasilva@gmail.com  
+Any comments or suggestions, email me to ppintodasilva@gmail.com  
 Or just go watch 007 knocking'em dead.
 
 Pedro Pinto da Silva,  
