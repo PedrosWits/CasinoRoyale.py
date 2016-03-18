@@ -103,7 +103,7 @@ For instance, you can create Mutated Dies like this:
   mutant4 = MutatedDie(psides = [0.5, 0.2, 0.3], verifyInput = False)
   # or
   # this throws a ValueError exception
-  mutant5 = MutatedDie([0.4, 0.5, 0.2], False)
+  mutant5 = MutatedDie([0.4, 0.5, 0.2], True)
 ```
 
 You can review the differences between the several implementations in the table below, extracted from
