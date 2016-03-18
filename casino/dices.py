@@ -4,14 +4,6 @@ from coins import BiasedCoin
 from abc import ABCMeta, abstractmethod
 from utils import areEqual, lcm, MAX_LIST_SIZE
 
-class FairDie(object):
-
-    def __init__(self, nsides):
-        self.nsides = nsides
-
-    def roll(self):
-        return int(math.floor(r.random()*self.nsides))
-
 class LoadedDie(object):
     __metaclass__ = ABCMeta
 
@@ -21,15 +13,9 @@ class LoadedDie(object):
             if areEqual(psides):
                 raise ValueError('The probabilities for the sides ' \
                                 'are all equal making this a fair dice!')
-            indixes = [i for i,pside in enumerate(psides) if pside < 0 or pside > 1]
-            if len(indixes) > 0:
-                ex = ValueError('You defined one or ' \
-                        'more probabilities lower than 0 or greater than 1')
-                ex.indexes = indixes
-                raise ex
             soma = sum(psides)
             if soma != 1:
-                ex = ValueError('The sum of the given probabilities is different than zero')
+                ex = ValueError('The sum of the given probabilities is different than one!')
                 ex.soma = soma
                 raise ex
         # else, save the psides for later usage
@@ -45,6 +31,13 @@ class LoadedDie(object):
     def roll(self):
         pass
 
+class FairDie(object):
+
+    def __init__(self, nsides):
+        self.nsides = nsides
+
+    def roll(self):
+        return int(math.floor(random.random()*self.nsides))
 
 ##################################################
 #                                                #
@@ -52,51 +45,6 @@ class LoadedDie(object):
 #                                                #
 ##################################################
 
-class LoadedDie(object):
-    __metaclass__ = ABCMeta
-
-    def __init__(self, psides, verifyInput = True):
-        if verifyInput:
-            #psides should be different, we can verify that, but it
-            if areEqual(psides):
-                raise ValueError('The probabilities for the sides ' \
-                                'are all equal making this a fair dice!')
-            indixes = [i for i,pside in enumerate(psides) if pside < 0 or pside > 1]
-            if len(indixes) > 0:
-                ex = ValueError('You defined one or ' \
-                        'more probabilities lower than 0 or greater than 1')
-                ex.indexes = indixes
-                raise ex
-            soma = sum(psides)
-            if soma != 1:
-                ex = ValueError('The sum of the given probabilities is different than zero')
-                ex.soma = soma
-                raise ex
-        # else, save the psides for later usage
-        self.psides = psides
-        # run pre_processing
-        self.pre_process()
-
-    @abstractmethod
-    def pre_process(self):
-        pass
-
-    @abstractmethod
-    def roll(self):
-        pass
-
-class FairDie(object):
-
-    def __init__(self, nsides):
-        self.nsides = nsides
-
-    def roll(self):
-        return int(math.floor(r.random()*self.nsides))
-
-#
-#
-#   Algorithms for implementing a loaded Die
-#
 
 #   Simulates a Loaded Die from a Fair Die
 #
