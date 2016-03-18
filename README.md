@@ -1,6 +1,6 @@
 # CasinoRoyale.py
 
-##### A small python library for tossing biased coins and rolling loaded dices!
+##### A small python library for tossing coins and rolling dices!
 
 ![Just a random casino for y'all!](/../just-for-image/casino.jpg?raw=true "Sauron's Casino")
 
