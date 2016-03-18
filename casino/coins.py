@@ -1,6 +1,5 @@
 import math
 import random
-from abc import ABCMeta, abstractmethod
 
 class Coin(object):
 
@@ -13,7 +12,7 @@ class Coin(object):
     #   1 - heads
     #   0 - tails
     def toss(self):
-        if r.random() < self.pheads:
+        if rrandom.random() < self.pheads:
             return 1
         else:
             return 0
