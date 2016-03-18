@@ -83,12 +83,12 @@ We provide 6 different implementations of the **Loaded Die**, based on Keith's p
 
 | Implementation | Simulates a loaded die using |
 | -------------  |:-------------:|
-| **MutatedDie** | A fair die |
-| **CoinedDie**  | Biased coins |
-| **RouletteDie** | The roulette wheel selection method |
-| **HybridDie**   | The Naive Alias method |
-| **AliasDie**  | The Alias method |
-| **VosesDie** | The Voses Alias method |
+| *MutatedDie* | A fair die |
+| *CoinedDie*  | Biased coins |
+| *RouletteDie* | The roulette wheel selection method |
+| *HybridDie*   | The Naive Alias method |
+| *AliasDie*  | The Alias method |
+| *VosesDie* | The Voses Alias method |
 
 The constructor parameters and methods for all classes are the same.  
 For instance, you can create Mutated Dies like this:
@@ -144,6 +144,8 @@ of probabilities respects the following properties:
 on an answer provided at [stackoverflow](http://stackoverflow.com/questions/855191/how-big-can-a-python-array-get).
 Nevertheless, as stated by Keith, the usable memory required to hold in memory the size of the *L* array can easily
 be larger than the available memory in RAM. Thus, checking the size of the array against the value of MAX_LIST_SIZE, when you can trigger an overflow error with just a two value list (see Keith's example) does look in fact like a useless, pointless operation. Nevertheless it's there and if you don't like it you can just simply take it off.
+
++ You can run the tests (/casino/tests) using your favourite python testing framework or library.
 
 ---
 
