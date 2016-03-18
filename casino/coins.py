@@ -12,7 +12,7 @@ class Coin(object):
     #   1 - heads
     #   0 - tails
     def toss(self):
-        if rrandom.random() < self.pheads:
+        if random.random() < self.pheads:
             return 1
         else:
             return 0
