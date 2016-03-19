@@ -16,7 +16,7 @@ author_email = 'ppintodasilva@gmail.com'
 
 version = '0.1'
 
-dependencies = []
+dependencies = ['nose']
 
 packages = ['casino']
 
