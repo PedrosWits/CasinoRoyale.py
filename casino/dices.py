@@ -98,8 +98,7 @@ class CoinedDie(LoadedDie):
 
     def roll(self):
         mass = 1.0
-        size = len(self.psides)
-        for i in range(size):
+        for i in range(len(self.psides)):
             pi = self.psides[i]
             if Coin(pi/mass).toss() == 1:
                 return i
@@ -116,14 +115,33 @@ class RouletteDie(LoadedDie):
     def pre_process(self):
         A = []
         A.append(self.psides[0])
-        size = len(self.psides)
-        for i in range(1,size):
+        for i in range(1, len(self.psides)):
             val = A[i-1] + self.psides[i]
             A.append(val)
         self.A = A
+        #print A
 
     def roll(self):
         x = random.random()
+        #print ("x = %.2f") % x
+        head = 0
+        tail = len(self.A)-1
+        candidate = -1
+
+        # Binary search - returns index of smallest element in A larger than x
+        while head <= tail:
+            mid = (head + tail)/2
+            #print "Head = %d, Mid = %d, Tail = %d" % (head, mid, tail)
+            val = self.A[mid]
+            if val > x:
+                candidate = mid
+                tail = mid-1
+            elif val < x:
+                if candidate != -1:
+                    return candidate
+                head = mid+1
+        return mid
+
 
     def optimize(self):
         pass
@@ -133,23 +151,36 @@ class RouletteDie(LoadedDie):
 #   Beware: Appearances can be deceiving!!
 class HybridDie(LoadedDie):
     def __init__(self, psides, verifyInput = True):
+        self.nsides = len(psides)
         super(HybridDie, self).__init__(psides, verifyInput)
 
     def pre_process(self):
-        pass
+        pmax = max(self.psides)
+        self.coins = []
+        for i in range(self.nsides):
+            self.coins.append(self.psides[i]/pmax)
 
     def roll(self):
-        pass
+        while True:
+            index = FairDie(self.nsides).roll()
+            if Coin(self.coins[index]).toss() == 1:
+                return index
 
 #   Simulates a Loaded Die using the Naive Alias Method
 #
 #   Beware: A prize for one ignorant clown is ahead!
 class NaiveDie(LoadedDie):
     def __init__(self, psides, verifyInput = True):
+        self.nsides = len(psides)
         super(NaiveDie, self).__init__(psides, verifyInput)
 
     def pre_process(self):
-        pass
+        for side in self.psides:
+            side *= self.nsides
+        self.Alias = []
+        self.Prob = []
+        for j in range(1, self.nsides):
+            fin
 
     def roll(self):
         pass
@@ -181,3 +212,19 @@ class VosesDie(LoadedDie):
         pass
 
 
+################################################################
+#
+#   COMMON FUNCTIONS FOR THE ALIAS METHODS
+#
+################################################################
+
+
+def findLower(probs, threshold):
+    for prob in probs:
+        if prob <= threshold:
+            return prob
+
+def findGreater(probs, threshold):
+    for prob in probs:
+        if prob >= threshold:
+            return prob
