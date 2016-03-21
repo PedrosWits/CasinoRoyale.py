@@ -175,12 +175,23 @@ class NaiveDie(LoadedDie):
         super(NaiveDie, self).__init__(psides, verifyInput)
 
     def pre_process(self):
-        for side in self.psides:
-            side *= self.nsides
-        self.Alias = []
-        self.Prob = []
+        new_probs = self.psides[:]
+        print new_probs
+        for prob in new_probs:
+            prob *= self.nsides
+        self.Alias = [0] * self.nsides
+        self.Prob = [0] * self.nsides
         for j in range(1, self.nsides):
-            fin
+            (index_l, pl) = findLower(new_probs, 1)
+            (index_g, pg) = findGreater(new_probs, 1, index_l)
+            self.Prob[index_l] = pl
+            self.Alias[index_l] = index_g
+            del new_probs[index_l]
+            new_probs[index_g] = pg - (1 - pl)
+        print new_probs
+        # Let i be the last probability remaining, which must have weight 1
+        # Set Prob[i] = 1
+
 
     def roll(self):
         pass
@@ -220,11 +231,14 @@ class VosesDie(LoadedDie):
 
 
 def findLower(probs, threshold):
-    for prob in probs:
+    for i,prob in enumerate(probs):
         if prob <= threshold:
-            return prob
+            return (i, prob)
 
-def findGreater(probs, threshold):
-    for prob in probs:
+def findGreater(probs, threshold, skipIndex = -1):
+    for i, prob in enumerate(probs):
+        if i == skipIndex:
+            continue
         if prob >= threshold:
-            return prob
+            return (i, prob)
+
