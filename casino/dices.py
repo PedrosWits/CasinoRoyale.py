@@ -1,6 +1,8 @@
 import random
 import math
-from coins import BiasedCoin
+from fractions import Fraction
+from decimal import Decimal
+from coins import BiasedCoin, Coin
 from abc import ABCMeta, abstractmethod
 from utils import areEqual, lcm, MAX_LIST_SIZE
 
@@ -17,6 +19,12 @@ class LoadedDie(object):
             if soma != 1:
                 ex = ValueError('The sum of the given probabilities is different than one!')
                 ex.soma = soma
+                raise ex
+            indixes = [i for i,pside in enumerate(psides) if pside < 0 or pside > 1]
+            if len(indixes) > 0:
+                ex = ValueError('You defined one or ' \
+                        'more probabilities lower than 0 or greater than 1')
+                ex.indexes = indixes
                 raise ex
         # else, save the psides for later usage
         self.psides = psides
@@ -56,7 +64,9 @@ class MutatedDie(LoadedDie):
         super(MutatedDie, self).__init__(psides, verifyInput)
 
     def pre_process(self):
-        pfracs = reduce(lambda x: Fraction(x), self.psides)
+        pfracs = []
+        for pside in self.psides:
+            pfracs.append(Fraction(Decimal(str(pside))))
         denominators = [pfrac.denominator for pfrac in pfracs]
         self.L = lcm(denominators)
         if self.L > MAX_LIST_SIZE:
@@ -87,7 +97,14 @@ class CoinedDie(LoadedDie):
         pass
 
     def roll(self):
-        pass
+        mass = 1.0
+        size = len(self.psides)
+        for i in range(size):
+            pi = self.psides[i]
+            if Coin(pi/mass).toss() == 1:
+                return i
+            else:
+                mass -= pi
 
 #   Simulates a Loaded Die from a the roulette wheel selection method
 #
@@ -97,10 +114,16 @@ class RouletteDie(LoadedDie):
         super(RouletteDie, self).__init__(psides, skipVerification)
 
     def pre_process(self):
-        pass
+        A = []
+        A.append(self.psides[0])
+        size = len(self.psides)
+        for i in range(1,size):
+            val = A[i-1] + self.psides[i]
+            A.append(val)
+        self.A = A
 
     def roll(self):
-        pass
+        x = random.random()
 
     def optimize(self):
         pass

@@ -1,10 +1,12 @@
 import math
 import random
 
+EPS = 0.000001
+
 class Coin(object):
 
     def __init__(self, pheads = 0.5):
-        if pheads < 0 or pheads > 1:
+        if pheads < 0 or pheads - 1 > EPS:
             raise ValueError('Probability of heads must be between [0,1]')
         self.pheads = pheads
 
