@@ -1,14 +1,9 @@
-from nose.tools import eq_, ok_, raises, nottest
-from casino.dices import FairDie, MutatedDie, CoinedDie, RouletteDie, HybridDie
+from nose.tools import eq_, ok_, raises, nottest, assert_true
+from casino.dices import FairDie, MutatedDie, CoinedDie, RouletteDie
+from casino.dices import HybridDie, NaiveDie, AliasDie, VosesDie, LoadedDie
 import random
 
 # Test all loaded implementations with the same inputs
-SEED_LOADED = 1337
-N_RUNS = 10
-PSIDES_LOADED_1 = [0.4, 0.1, 0.2, 0.1, 0.05, 0.15]
-EXPECTED_LOADED_1 = [2, 2, 0, 2, 0, 4, 0, 3, 5, 0]
-EXPECTED_LOADED_2 = [2, 1, 5, 0, 2, 2, 5, 5, 3, 0]
-EXPECTED_LOADED_3 = [0, 5, 5, 0, 2, 2, 1, 3, 3, 4]
 
 def test_fair_is_fair():
     random.seed(1000)
@@ -41,12 +36,6 @@ def test_bad_loaded4():
     psides = [-0.1, 0.8, 0.3]
     baddie4 = MutatedDie(psides)
 
-def test_all_loaded_dices():
-    eq_(die_rundown(MutatedDie(PSIDES_LOADED_1)), EXPECTED_LOADED_1)
-    eq_(die_rundown(CoinedDie(PSIDES_LOADED_1)), EXPECTED_LOADED_2)
-    eq_(die_rundown(RouletteDie(PSIDES_LOADED_1)), EXPECTED_LOADED_1)
-    eq_(die_rundown(HybridDie(PSIDES_LOADED_1)), EXPECTED_LOADED_3)
-
 def test_binary_search():
     psides = [0.15, 0.15, 0.30, 0.20, 0.05, 0.10, 0.05]
     expected_A = [0.15, 0.30, 0.60, 0.80, 0.85, 0.95, 1.0]
@@ -75,10 +64,79 @@ def test_binary_search():
         elif x > 0.95 and x <= 1.0:
             assert face == 6
 
+###
+# Test algorithms asymptotic behavior - counts should approach psides as number
+#   of iterations increases
+###
+
+PSIDES = ([0.20, 0.30, 0.40, 0.10],
+          [0.10, 0.15, 0.25, 0.50],
+          [0.10, 0.07, 0.03, 0.46, 0.04, 0.30],
+          [0.89, 0.01, 0.01, 0.02, 0.07])
+ERROR_INTERVAL = 0.020
+SEPARATOR = "\n############################\n"
+NITER = 10000
+I_TITLE = "I = Input face probabilities"
+O_TITLE = "O = Normalized probabilitie counters over %d iterations" % NITER
+SOFT_SEPARATOR = "---"
+
 @nottest
-def die_rundown(die):
-    random.seed(SEED_LOADED)
-    result = []
-    for i in range(N_RUNS):
-        result.append(die.roll())
-    return result
+def count_faces(die, niter=NITER):
+    face_counts = [0] * die.nsides
+    for i in range(niter):
+        face = die.roll()
+        face_counts[face] += 1.0
+    return [count/niter for count in face_counts]
+
+@nottest
+def assert_faces_counts(die, counts):
+    if not hasattr(die, 'psides'):
+        psides = [1.0/die.nsides] * len(counts)
+    else:
+        psides = die.psides
+    for i,count in enumerate(counts):
+        lower_bound = psides[i] - ERROR_INTERVAL
+        upper_bound = psides[i] + ERROR_INTERVAL
+        assert_true(lower_bound <= count <= upper_bound, \
+                '\n\tFace %d: pside = %.2f \n\tResult: %.4f <= %.4f <= %.4f' %
+                (i, psides[i], lower_bound, count, upper_bound))
+
+def test_fair_die():
+    random.seed()
+    sides = 4
+    die = FairDie(sides)
+    assert_faces_counts(die, count_faces(die))
+
+def test_loaded_die(DieClass):
+    #if not isinstance(DieClass, LoadedDie):
+    #    raise ValueError('Wrong parameter - must be a type of LoadedDie')
+    random.seed()
+    dices = []
+    n = len(PSIDES)
+    for i in range(n):
+        dices.append(DieClass(PSIDES[i]))
+    # evaluate each die
+    counts = []
+    for die in dices:
+        this_count = count_faces(die)
+        counts.append(this_count)
+        assert_faces_counts(die, this_count)
+    ## Print results
+    print DieClass
+    for i,count in enumerate(counts):
+        print "I: %s" % "["+", ".join(["%.4f" % x for x in PSIDES[i]])+"]"
+        print "O: %s" % str(count)
+        print SOFT_SEPARATOR
+    print SEPARATOR
+
+def test_loaded_dices():
+    print SEPARATOR
+    print "Maximum error: %.3f\n" % ERROR_INTERVAL
+    print I_TITLE
+    print O_TITLE
+    print SEPARATOR
+    test_loaded_die(MutatedDie)
+    test_loaded_die(CoinedDie)
+    test_loaded_die(RouletteDie)
+    test_loaded_die(HybridDie)
+    test_loaded_die(VosesDie)

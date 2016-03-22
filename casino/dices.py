@@ -28,6 +28,7 @@ class LoadedDie(object):
                 raise ex
         # else, save the psides for later usage
         self.psides = psides
+        self.nsides = len(psides)
         # run pre_processing
         self.pre_process()
 
@@ -98,7 +99,7 @@ class CoinedDie(LoadedDie):
 
     def roll(self):
         mass = 1.0
-        for i in range(len(self.psides)):
+        for i in range(self.nsides):
             pi = self.psides[i]
             if Coin(pi/mass).toss() == 1:
                 return i
@@ -115,7 +116,7 @@ class RouletteDie(LoadedDie):
     def pre_process(self):
         A = []
         A.append(self.psides[0])
-        for i in range(1, len(self.psides)):
+        for i in range(1, self.nsides):
             val = A[i-1] + self.psides[i]
             A.append(val)
         self.A = A
@@ -153,7 +154,6 @@ class RouletteDie(LoadedDie):
 #   Beware: Appearances can be deceiving!!
 class HybridDie(LoadedDie):
     def __init__(self, psides, verifyInput = True):
-        self.nsides = len(psides)
         super(HybridDie, self).__init__(psides, verifyInput)
 
     def pre_process(self):
@@ -173,24 +173,28 @@ class HybridDie(LoadedDie):
 #   Beware: A prize for one ignorant clown is ahead!
 class NaiveDie(LoadedDie):
     def __init__(self, psides, verifyInput = True):
-        self.nsides = len(psides)
         super(NaiveDie, self).__init__(psides, verifyInput)
 
     def pre_process(self):
-        new_probs = self.psides[:]
+        raise NotImplementedError("I haven't yet implemented this data structure."\
+                "I'm sorry. Please try a different one")
+        new_probs[:] = [i * self.nsides for i in self.psides]
+        print "New probabilities: "
         print new_probs
-        for prob in new_probs:
-            prob *= self.nsides
         self.Alias = [0] * self.nsides
         self.Prob = [0] * self.nsides
         for j in range(1, self.nsides):
             (index_l, pl) = findLower(new_probs, 1)
+            print "l = %d, Pl = %.2f" % (index_l, pl)
             (index_g, pg) = findGreater(new_probs, 1, index_l)
+            print "g = %d, Pg = %.2f" % (index_g, pg)
             self.Prob[index_l] = pl
             self.Alias[index_l] = index_g
+            print self.Prob
+            print self.Alias
             del new_probs[index_l]
             new_probs[index_g] = pg - (1 - pl)
-        print new_probs
+            print new_probs
         # Let i be the last probability remaining, which must have weight 1
         # Set Prob[i] = 1
 
@@ -206,7 +210,11 @@ class AliasDie(LoadedDie):
         super(AliasDie, self).__init__(psides, verifyInput)
 
     def pre_process(self):
-        pass
+        raise NotImplementedError("I haven't yet implemented this data structure."\
+                "I'm sorry. Please try a different one")
+        self.Alias = [0] * self.nsides
+        self.Prob = [0] * self.nsides
+
 
     def roll(self):
         pass
@@ -219,10 +227,41 @@ class VosesDie(LoadedDie):
         super(VosesDie, self).__init__(psides, verifyInput)
 
     def pre_process(self):
-        pass
+        self.Alias = [0] * self.nsides
+        self.Prob = [0] * self.nsides
+        Small = []
+        Large = []
+        new_probs = [i * self.nsides for i in self.psides]
+        for i,prob in enumerate(new_probs):
+            if prob < 1:
+                Small.append(i)
+            else:   #prob >= 1
+                Large.append(i)
+        while Small and Large:
+            l = Small.pop(0)
+            g = Large.pop(0)
+            self.Prob[l] = new_probs[l]
+            self.Alias[l] = g
+            new_probs[g] = (new_probs[g] + new_probs[l]) - 1
+            if new_probs[g] < 1:
+                Small.append(g)
+            else:
+                Large.append(g)
+        while Large:
+            g = Large.pop(0)
+            self.Prob[g] = 1
+        while Small:
+            l = Small.pop(0)
+            self.Prob[l] = 1
+        #print self.Prob
+        #print self.Alias
 
     def roll(self):
-        pass
+        i = FairDie(self.nsides).roll()
+        if BiasedCoin(self.Prob[i]).toss() == 1:
+            return i
+        else:
+            return self.Alias[i]
 
 
 ################################################################
