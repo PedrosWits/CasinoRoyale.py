@@ -123,6 +123,7 @@ class RouletteDie(LoadedDie):
 
     def roll(self):
         x = random.random()
+        self.x = x
         #print ("x = %.2f") % x
         head = 0
         tail = len(self.A)-1
@@ -137,11 +138,12 @@ class RouletteDie(LoadedDie):
                 candidate = mid
                 tail = mid-1
             elif val < x:
-                if candidate != -1:
-                    return candidate
                 head = mid+1
-        return mid
-
+        #
+        if self.A[mid] >= x:
+            return mid
+        else:
+            return candidate
 
     def optimize(self):
         pass

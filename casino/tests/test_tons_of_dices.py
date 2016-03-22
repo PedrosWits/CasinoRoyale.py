@@ -47,6 +47,34 @@ def test_all_loaded_dices():
     eq_(die_rundown(RouletteDie(PSIDES_LOADED_1)), EXPECTED_LOADED_1)
     eq_(die_rundown(HybridDie(PSIDES_LOADED_1)), EXPECTED_LOADED_3)
 
+def test_binary_search():
+    psides = [0.15, 0.15, 0.30, 0.20, 0.05, 0.10, 0.05]
+    expected_A = [0.15, 0.30, 0.60, 0.80, 0.85, 0.95, 1.0]
+
+    die = RouletteDie(psides)
+    dif_A = [i - j for i, j in zip(expected_A, die.A)]
+    for item in dif_A:
+        assert abs(item) < 0.0001
+
+    for number in range(1000):
+        face = die.roll()
+        x = die.x
+        #print "x = %.2f, face = %d" % (x,face)
+        if x <= 0.15:
+            assert face == 0
+        elif x > 0.15 and x <= 0.30:
+            assert face == 1
+        elif x > 0.30 and x <= 0.60:
+            assert face == 2
+        elif x > 0.60 and x <= 0.80:
+            assert face == 3
+        elif x > 0.80 and x <= 0.85:
+            assert face == 4
+        elif x > 0.85 and x <= 0.95:
+            assert face == 5
+        elif x > 0.95 and x <= 1.0:
+            assert face == 6
+
 @nottest
 def die_rundown(die):
     random.seed(SEED_LOADED)
