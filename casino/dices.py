@@ -20,7 +20,7 @@ class LoadedDie(object):
                 ex = ValueError('The sum of the given probabilities is different than one!')
                 ex.soma = soma
                 raise ex
-            indixes = [i for i,pside in enumerate(psides) if pside < 0 or pside > 1]
+            indixes = [i for i,pside in enumerate(psides) if pside <= 0 or pside > 1]
             if len(indixes) > 0:
                 ex = ValueError('You defined one or ' \
                         'more probabilities lower than 0 or greater than 1')
