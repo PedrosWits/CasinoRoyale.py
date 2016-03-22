@@ -81,8 +81,8 @@ We provide 7 different implementations of the **Loaded Die** (5 currently), base
 | *MutatedDie* | A fair die | y |
 | *CoinedDie*  | Biased coins | y |
 | *RouletteDie* | The roulette wheel selection method | y|
-| *HybridDie*   | The Naive Alias method | y |
-| *NaiveDie* | A combination of fair dices and biased coins | n |
+| *HybridDie*   | A combination of fair dices and biased coins | y |
+| *NaiveDie* | The Naive Alias method  | n |
 | *AliasDie*  | The Alias method | n |
 | *VosesDie* | The Voses Alias method | y |
 
