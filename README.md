@@ -24,11 +24,15 @@ So, I decided to implement the data structures and algorithms in a python module
 
 + Create a fair coin, with equal tossing chances:
 ```python
+  from casino.coins import FairCoin
+  
   fair_coin = FairCoin()
 ```
 
 + Create a biased coin:
 ```python
+  from casino.coins import BiasedCoin
+  
   biased_coin = BiasedCoin(0.7)
   # or with
   biased_coin = BiasedCoin(pheads=0.7)
@@ -36,6 +40,8 @@ So, I decided to implement the data structures and algorithms in a python module
 
 + Or just create an arbitrary coin:
 ```python
+  from casino.coins import Coin
+  
   coin = Coin(0.1337)
   # or with
   coin = Coin(pheads=0.1337)
@@ -57,6 +63,8 @@ result is evaluated to **1** if **heads** or **0** if **tails**
 
 + Create a fair die with *n* sides, with equal rolling chances for all sides:
 ```python
+  from casino.dices import FairDie
+  
   fair_die = FairDie(6)
   # or
   fair_die = FairDie(nsides=6)
@@ -90,6 +98,8 @@ The constructor parameters and methods for all classes are the same.
 For instance, you can create Mutated Dies like this:
 
 ```python
+  from casino.dices import MutantDie
+  
   mutant = MutatedDie([0.3, 0.2, 0.5])
   # or
   mutant2 = MutatedDie(psides = [0.7, 0.2, 0.1])
@@ -101,6 +111,18 @@ For instance, you can create Mutated Dies like this:
   # or
   # this raises a ValueError exception
   mutant5 = MutatedDie([0.4, 0.5, 0.2], True)
+```
+Or use other implementations of LoadedDie in the same manner:
+
+```python
+  from casino.dices import CoinedDie, RouletteDie, HybridDie, VosesDie
+  
+  psides = [0.2, 0.3, 0.5]
+  
+  die1 = CoinedDie(psides)
+  die2 = RouletteDie(psides)
+  die3 = HybridDie(psides)
+  die4 = VosesDie(psides)
 ```
 
 You can review the differences between the several implementations in the table below, extracted from
