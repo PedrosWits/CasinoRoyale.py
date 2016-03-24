@@ -9,18 +9,21 @@ from utils import areEqual, lcm, MAX_LIST_SIZE
 class LoadedDie(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, psides, verifyInput = True):
-        if verifyInput:
-            #psides should be different, we can verify that, but it
-            if areEqual(psides):
-                raise ValueError('The probabilities for the sides ' \
-                                'are all equal making this a fair dice!')
+    def __init__(self, psides, checkProperties = True, canBeFair = False):
+        if checkProperties:
+            #Verify property 1 - Is not fair die
+            if not canBeFair:
+                if areEqual(psides):
+                    raise ValueError('The probabilities for the sides ' \
+                                    'are all equal making this a fair dice!')
+            # Verify property 2 - Sum of sides is equal to 1 (approximately)
             soma = sum(psides)
-            if soma != 1:
-                ex = ValueError('The sum of the given probabilities is different than one!')
+            if abs(soma - 1) > 0.0001:
+                ex = ValueError("The sum of the given probabilities is different than one!\n%r" % psides)
                 ex.soma = soma
                 raise ex
-            indixes = [i for i,pside in enumerate(psides) if pside <= 0 or pside > 1]
+            # Verify property 3 - No probability is lower than 0 or greater than 1
+            indixes = [i for i,pside in enumerate(psides) if pside < 0 or pside > 1]
             if len(indixes) > 0:
                 ex = ValueError('You defined one or ' \
                         'more probabilities lower than 0 or greater than 1')
@@ -61,8 +64,8 @@ class FairDie(object):
 #           It only works with Fractions as input!!
 
 class MutatedDie(LoadedDie):
-    def __init__(self, psides, verifyInput = True):
-        super(MutatedDie, self).__init__(psides, verifyInput)
+    def __init__(self, psides, checkProperties = True, canBeFair = False):
+        super(MutatedDie, self).__init__(psides, checkProperties, canBeFair)
 
     def pre_process(self):
         pfracs = []
@@ -91,8 +94,8 @@ class MutatedDie(LoadedDie):
 #
 #   Beware: A coined die is ahead!!
 class CoinedDie(LoadedDie):
-    def __init__(self, psides, verifyInput = True):
-        super(CoinedDie, self).__init__(psides, verifyInput)
+    def __init__(self, psides, checkProperties = True, canBeFair = False):
+        super(CoinedDie, self).__init__(psides, checkProperties, canBeFair)
 
     def pre_process(self):
         pass
@@ -110,8 +113,8 @@ class CoinedDie(LoadedDie):
 #
 #   Beware: High rotations ahead! You may get dizzy!!
 class RouletteDie(LoadedDie):
-    def __init__(self, psides, skipVerification = True):
-        super(RouletteDie, self).__init__(psides, skipVerification)
+    def __init__(self, psides, checkProperties = True, canBeFair = False):
+        super(RouletteDie, self).__init__(psides, checkProperties, canBeFair)
 
     def pre_process(self):
         A = []
@@ -153,8 +156,8 @@ class RouletteDie(LoadedDie):
 #
 #   Beware: Appearances can be deceiving!!
 class HybridDie(LoadedDie):
-    def __init__(self, psides, verifyInput = True):
-        super(HybridDie, self).__init__(psides, verifyInput)
+    def __init__(self, psides, checkProperties = True, canBeFair = False):
+        super(HybridDie, self).__init__(psides, checkProperties, canBeFair)
 
     def pre_process(self):
         pmax = max(self.psides)
@@ -172,8 +175,8 @@ class HybridDie(LoadedDie):
 #
 #   Beware: A prize for one ignorant clown is ahead!
 class NaiveDie(LoadedDie):
-    def __init__(self, psides, verifyInput = True):
-        super(NaiveDie, self).__init__(psides, verifyInput)
+    def __init__(self, psides, checkProperties = True, canBeFair = False):
+        super(NaiveDie, self).__init__(psides, checkProperties, canBeFair)
 
     def pre_process(self):
         raise NotImplementedError("I haven't yet implemented this data structure."\
@@ -206,8 +209,8 @@ class NaiveDie(LoadedDie):
 #
 #   Beware: Confidential information!!
 class AliasDie(LoadedDie):
-    def __init__(self, psides, verifyInput = True):
-        super(AliasDie, self).__init__(psides, verifyInput)
+    def __init__(self, psides, checkProperties = True, canBeFair = False):
+        super(AliasDie, self).__init__(psides, checkProperties, canBeFair)
 
     def pre_process(self):
         raise NotImplementedError("I haven't yet implemented this data structure."\
@@ -223,8 +226,8 @@ class AliasDie(LoadedDie):
 #
 #   Beware: The next step is into hell!!
 class VosesDie(LoadedDie):
-    def __init__(self, psides, verifyInput = True):
-        super(VosesDie, self).__init__(psides, verifyInput)
+    def __init__(self, psides, checkProperties = True, canBeFair = False):
+        super(VosesDie, self).__init__(psides, checkProperties, canBeFair)
 
     def pre_process(self):
         self.Alias = [0] * self.nsides
