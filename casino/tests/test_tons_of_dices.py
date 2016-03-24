@@ -107,6 +107,7 @@ def test_fair_die():
     die = FairDie(sides)
     assert_faces_counts(die, count_faces(die))
 
+@nottest
 def test_loaded_die(DieClass):
     #if not isinstance(DieClass, LoadedDie):
     #    raise ValueError('Wrong parameter - must be a type of LoadedDie')
